@@ -7,6 +7,7 @@
     <title>Interview Booking</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         h1 {
@@ -125,28 +126,50 @@
 
                 bookSlot(cell) {
                     if (cell.value !== 1) return;
-                    let name = prompt("Enter your name:");
-                    if (name) {
-                        // lets update the cell into the schedule
-                        console.log(cell);
-                        cell.status = name;
-                        cell.bgColor = "bg-red-300";
 
-                        fetch(this.scriptURL, {
-                            method: "POST",
-                            body: new URLSearchParams({
-                                action: "bookSlot",
-                                row: cell.row + 2, // Adjusted to match the row in the Google Sheet
-                                col: cell.col + 2, // Adjusted to match the column in the Google Sheet
-                                name: name,
-                            }),
-                        })
-                            .then((response) => response.json())
-                            .then((data) => {
-                                alert(data.message);
-                                //this.fetchSchedule();
-                            });
-                    }
+                    Swal.fire({
+                        title: "Your full name",
+                        input: "text",
+                        inputLabel: "Please enter your full name",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            let name = result.value;
+                            if (name) {
+                                // lets update the cell into the schedule
+                                console.log(cell);
+                                cell.status = name;
+                                cell.bgColor = "bg-red-300";
+
+                                fetch(this.scriptURL, {
+                                    method: "POST",
+                                    body: new URLSearchParams({
+                                        action: "bookSlot",
+                                        row: cell.row + 2, // Adjusted to match the row in the Google Sheet
+                                        col: cell.col + 2, // Adjusted to match the column in the Google Sheet
+                                        name: name,
+                                    }),
+                                })
+                                    .then((response) => response.json())
+                                    .then((data) => {
+                                        Swal.fire({
+                                            title: data.message,
+                                            icon: "success"
+                                        });
+                                        //alert(data.message);
+                                        //this.fetchSchedule();
+                                    })
+                                    .catch((error) => {
+                                        console.error("Error:", error);
+                                        Swal.fire({
+                                            title: "Error",
+                                            text: "There was an error booking the slot. Please try again with a different slot.",
+                                            icon: "error"
+                                        });
+                                    });
+                            }
+                        }
+                    });
+
                 },
             }));
         });
