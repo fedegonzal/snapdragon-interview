@@ -23,7 +23,6 @@
                 line-height: 1em;
                 padding: 10px;
                 text-align: center;
-                background-color: white;
                 border: 1px solid white;
             }
 
@@ -54,16 +53,16 @@
                 <table class="table-auto border-collapse w-full">
                     <thead>
                         <tr>
-                            <th>Time</th>
+                            <th class="bg-white">Time</th>
                             <template x-for="date in dates" :key="date">
-                                <th x-text="date"></th>
+                                <th class="bg-white" x-text="date"></th>
                             </template>
                         </tr>
                     </thead>
                     <tbody>
                         <template x-for="(row, rowIndex) in schedule" :key="rowIndex">
                             <tr>
-                                <td class="border p-2 text-center font-bold" x-text="hours[rowIndex]"></td>
+                                <td class="bg-white border p-2 text-center" x-text="hours[rowIndex]"></td>
                                 <template x-for="cell in row" :key="cell.col">
                                     <td
                                         class="border p-2 text-center"
