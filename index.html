@@ -1,155 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Interview Booking</title>
-        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
 
-        <style>
-            h1 {
-                color: white;
-                text-align: center;
-                margin-bottom: 20px;
-            }
-            table {
-                border: 1px solid #ccc;
-                border-radius: 8px;
-                overflow: hidden;
-            }
-            th,
-            td {
-                line-height: 1em;
-                padding: 10px;
-                text-align: center;
-                border: 1px solid white;
-            }
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interview Booking</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
 
-            body {
-                background-image: url(snapdragon-bg.jpg);
-                background-size: cover;
-                background-position-y: bottom;
-                background-repeat: no-repeat;
-                height: 100vh;
-                background-position-x: center;
-            }
+    <style>
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-            .overflow-x-auto {
-                overflow-x: auto;
-                max-width: 500px;
-                margin-left: auto;
-                margin-right: auto;
-            }
-        </style>
-    </head>
-    <body class="p-6 bg-gray-100" x-data="bookingApp">
-        <div>
-            <img src="ista-isologo.png" alt="Logo" class="mx-auto mb-4 w-24" />
-            <h1 class="text-2xl font-bold mb-4 text-center">Interview Booking</h1>
-        </div>
-        <div id="schedule" class="overflow-x-auto">
-            <template x-if="schedule.length">
-                <table class="table-auto border-collapse w-full">
-                    <thead>
+        table {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            line-height: 1em;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid white;
+        }
+
+        body {
+            background-image: url(snapdragon-bg.jpg);
+            background-size: cover;
+            background-position-y: bottom;
+            background-repeat: no-repeat;
+            height: 100vh;
+            background-position-x: center;
+        }
+
+        .overflow-x-auto {
+            overflow-x: auto;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+
+<body class="p-6 bg-gray-100" x-data="bookingApp">
+    <div>
+        <img src="ista-isologo.png" alt="Logo" class="mx-auto mb-4 w-24" />
+        <h1 class="text-2xl font-bold mb-4 text-center">Interview Booking</h1>
+    </div>
+    <div id="schedule" class="overflow-x-auto">
+        <template x-if="schedule.length">
+            <table class="table-auto border-collapse w-full">
+                <thead>
+                    <tr>
+                        <th class="bg-white">Time</th>
+                        <template x-for="date in dates" :key="date">
+                            <th class="bg-white" x-text="date"></th>
+                        </template>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template x-for="(row, rowIndex) in schedule" :key="rowIndex">
                         <tr>
-                            <th class="bg-white">Time</th>
-                            <template x-for="date in dates" :key="date">
-                                <th class="bg-white" x-text="date"></th>
+                            <td class="bg-white border p-2 text-center" x-text="hours[rowIndex]"></td>
+                            <template x-for="cell in row" :key="cell.col">
+                                <td class="border p-2 text-center" :class="cell.bgColor" @click="bookSlot(cell)"
+                                    x-text="cell.status"></td>
                             </template>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <template x-for="(row, rowIndex) in schedule" :key="rowIndex">
-                            <tr>
-                                <td class="bg-white border p-2 text-center" x-text="hours[rowIndex]"></td>
-                                <template x-for="cell in row" :key="cell.col">
-                                    <td
-                                        class="border p-2 text-center"
-                                        :class="cell.bgColor"
-                                        @click="bookSlot(cell)"
-                                        x-text="cell.status"
-                                    ></td>
-                                </template>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
-            </template>
-            <img src="ripples.svg" alt="Loading" class="mx-auto mt-4 w-24" x-show="!ready" />
-            <template x-if="!ready">
-                <p class="text-center text-white">Loading schedule...</p>
-            </template>
-        </div>
+                    </template>
+                </tbody>
+            </table>
+        </template>
+        <img src="ripples.svg" alt="Loading" class="mx-auto mt-4 w-24" x-show="!ready" />
+        <template x-if="!ready">
+            <p class="text-center text-white">Loading schedule...</p>
+        </template>
+    </div>
 
-        <script>
-            document.addEventListener("alpine:init", () => {
-                Alpine.data("bookingApp", () => ({
-                    scriptURL:
-                        "https://script.google.com/macros/s/AKfycbyOdrQNnwhNO9oQKyvNnMteyCctksNjDGVY95MCNiN4q9jrwC9FrrT6vGoKXNIP686x/exec",
-                    dates: [],
-                    schedule: [],
-                    hours: [],
-                    ready: false,
+    <script>
+        document.addEventListener("alpine:init", () => {
+            Alpine.data("bookingApp", () => ({
+                scriptURL:
+                    "https://script.google.com/macros/s/AKfycbyOdrQNnwhNO9oQKyvNnMteyCctksNjDGVY95MCNiN4q9jrwC9FrrT6vGoKXNIP686x/exec",
+                dates: [],
+                schedule: [],
+                hours: [],
+                ready: false,
 
-                    init() {
-                        this.fetchSchedule();
-                    },
+                init() {
+                    this.fetchSchedule();
+                },
 
-                    fetchSchedule() {
-                        this.ready = false;
-                        fetch(`${this.scriptURL}?action=getSchedule`)
-                            .then((response) => response.json())
-                            .then((data) => {
-                                this.dates = data.dates;
-                                this.schedule = data.slots;
-                                this.hours = data.hours;
+                fetchSchedule() {
+                    this.ready = false;
+                    fetch(`${this.scriptURL}?action=getSchedule`)
+                        .then((response) => response.json())
+                        .then((data) => {
+                            this.dates = data.dates;
+                            this.schedule = data.slots;
+                            this.hours = data.hours;
 
-                                this.schedule.forEach((row, rowIndex) => {
-                                    row.forEach((cell, colIndex) => {
-                                        cell.row = rowIndex;
-                                        cell.col = colIndex;
-                                        cell.status = cell.value === 1 ? "" : cell.value === 0 ? "Disabled" : "Booked";
-                                        cell.bgColor =
-                                            cell.value === 1
-                                                ? "bg-green-200"
-                                                : cell.value === 0
+                            this.schedule.forEach((row, rowIndex) => {
+                                row.forEach((cell, colIndex) => {
+                                    cell.row = rowIndex;
+                                    cell.col = colIndex;
+                                    cell.status = cell.value === 1 ? "" : cell.value === 0 ? "Disabled" : "Booked";
+                                    cell.bgColor =
+                                        cell.value === 1
+                                            ? "bg-green-200"
+                                            : cell.value === 0
                                                 ? "bg-gray-300"
                                                 : "bg-red-300";
-                                    });
                                 });
-                                this.ready = true;
                             });
-                    },
+                            this.ready = true;
+                        });
+                },
 
-                    bookSlot(cell) {
-                        if (cell.value !== 1) return;
-                        let name = prompt("Enter your name:");
-                        if (name) {
-                            // lets update the cell into the schedule
-                            console.log(cell);
-                            cell.status = name;
-                            cell.bgColor = "bg-red-300";
+                bookSlot(cell) {
+                    if (cell.value !== 1) return;
+                    let name = prompt("Enter your name:");
+                    if (name) {
+                        // lets update the cell into the schedule
+                        console.log(cell);
+                        cell.status = name;
+                        cell.bgColor = "bg-red-300";
 
-                            fetch(this.scriptURL, {
-                                method: "POST",
-                                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                                body: new URLSearchParams({
-                                    action: "bookSlot",
-                                    row: cell.row,
-                                    col: cell.col,
-                                    name: name,
-                                }),
-                            })
-                                .then((response) => response.json())
-                                .then((data) => {
-                                    alert(data.message);
-                                    //this.fetchSchedule();
-                                });
-                        }
-                    },
-                }));
-            });
-        </script>
-    </body>
+                        fetch(this.scriptURL, {
+                            method: "POST",
+                            body: new URLSearchParams({
+                                action: "bookSlot",
+                                row: cell.row + 2, // Adjusted to match the row in the Google Sheet
+                                col: cell.col + 2, // Adjusted to match the column in the Google Sheet
+                                name: name,
+                            }),
+                        })
+                            .then((response) => response.json())
+                            .then((data) => {
+                                alert(data.message);
+                                //this.fetchSchedule();
+                            });
+                    }
+                },
+            }));
+        });
+    </script>
+</body>
+
 </html>
